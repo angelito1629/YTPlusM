@@ -40,67 +40,79 @@ on:
         default: false
 
       enable_ytweaks:
-        description: "Generate YTweaks (YTPlusM)"
+        description: "Generate YTweaks (MaxTube)"
         type: boolean
         required: true
         default: false
         
       enable_gonerino:
-        description: "Generate Gonerino (YTPlusM)"
+        description: "Generate Gonerino (MaxTube)"
         type: boolean
         required: true
         default: false
 
       enable_youspeed:
-       description: "Generate YouSpeed (YTPlusM)"
+       description: "Generate YouSpeed (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_ytlcm:
-       description: "Generate YTLowContrastMode (YTPlusM)"
+       description: "Generate YTLowContrastMode (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_VolumeBoostYT:
-       description: "Generate VolumeBoostYT (YTPlusM)"
+       description: "Generate VolumeBoostYT (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_YouGetCaption:
-       description: "Generate YouGetCaption (YTPlusM)"
+       description: "Generate YouGetCaption (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_ytpf:
-       description: "Generate YTPlaybackFix, my tweak! (YTPlusM)"
+       description: "Generate YTPlaybackFix, my tweak! (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_ytpfBETA:
-       description: "Generate my YTPlaybackFix but latest beta version, at your own risk... (YTPlusM)"
+       description: "Generate my YTPlaybackFix but latest beta version, at your own risk... (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_ycq:
-       description: "Generate YouChooseQuality (YTPlusM)"
+       description: "Generate YouChooseQuality (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_ys:
-       description: "Generate YouShare (YTPlusM)"
+       description: "Generate YouShare (MaxTube)"
        type: boolean
        required: true
        default: false
 
       enable_pdstm:
-       description: "Generate PleaseDontStopTheMusic (YTPlusM)"
+       description: "Generate PleaseDontStopTheMusic (MaxTube)"
+       type: boolean
+       required: true
+       default: false
+
+      enable_youloop:
+       description: "NEW! Integrate YouLoop (MaxTube)"
+       type: boolean
+       required: true
+       default: false
+
+      enable_youmute:
+       description: "NEW! Integrate YouMute (MaxTube)"
        type: boolean
        required: true
        default: false
@@ -267,6 +279,14 @@ jobs:
       - name: Clone PleaseDontStopTheMusic
         if: ${{ inputs.enable_pdstm }}
         run: git clone --quiet --depth=1 https://github.com/mikey820/PleaseDontStopTheMusic.git
+
+      - name: Clone YouLoop
+        if: ${{ inputs.enable_youloop }}
+        run: git clone --quiet --depth=1 https://github.com/bhackel/YouLoop.git
+
+      - name: Clone YouMute
+        if: ${{ inputs.enable_youloop }}
+        run: git clone --quiet --depth=1 https://github.com/PoomSmart/YouMute.git
         
       - name: Build YouPiP
         if: ${{ inputs.enable_youpip }}
@@ -366,6 +386,18 @@ jobs:
           find . -name "packages" -type d -exec rm -rf {} + 2>/dev/null || true
           $(MAKE) -C rootless package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless || true
 
+      - name: Build YouLoop
+        if: ${{ inputs.enable_youloop }}
+        run: |
+          cd YouLoop && make clean package DEBUG=0 FINALPACKAGE=1
+          mv packages/*.deb ../youloop.deb
+
+      - name: Build YouMute
+        if: ${{ inputs.enable_youmute }}
+        run: |
+          cd YouMute && make clean package DEBUG=0 FINALPACKAGE=1
+          mv packages/*.deb ../youmute.deb
+
       - name: Clone Open in YouTube (Safari extension)
         run: |
           git clone --quiet -n --depth=1 --filter=tree:0 https://github.com/BillyCurtis/OpenYouTubeSafariExtension
@@ -373,7 +405,7 @@ jobs:
           git sparse-checkout set --no-cone OpenYoutubeSafariExtension.appex
           git checkout
 
-      - name: Svuota e prepara le cartelle di output
+      - name: Prepare output folders
         if: always()
         run: |
           rm -rf ${{ github.workspace }}/output_debs
