@@ -242,7 +242,7 @@ jobs:
 
       - name: Clone Gonerino
         if: ${{ inputs.enable_gonerino }}
-        run: git clone --quiet --depth=1 https://github.com/castdrian/Gonerino.git
+        run: git clone --quiet --depth=1 https://github.com/fosterbarnes/YGonerino.git
       
       - name: Clone YouSpeed
         if: ${{ inputs.enable_youspeed }}
